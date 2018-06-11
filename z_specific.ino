@@ -241,7 +241,10 @@ void drawghosts() {
       if (ghostydir[i]==1) { u=6; } 
       if (ghoststatus[i]==1) { u=10; } 
       if (powerpilltimer>0) { 
-        u=8; gb.display.setColor(BLUE);
+        u=8; 
+        gb.display.setColor(BLUE);
+        if ((powerpilltimer % 4 >  1)&&(ghoststatus[i]==1)) { gb.display.setColor(WHITE); }
+        ghostmode="scatter";
       } else {
         if (i==1) { u=2;gb.display.setColor(LIGHTBLUE); }
         if (i==2) { u=2;gb.display.setColor(PINK); }
@@ -261,10 +264,11 @@ void checkghostcollission() {
         score=score+ghostscore;
         ghostscore=ghostscore*2;
         ghoststatus[i]=1;
-        // playsoundfx(5,1); // play ghost eaten sound
+         gb.sound.fx(eat_ghost);
       } else { // paq man eaten
         deadtimer=70;
-        // playsoundfx(7,1);        
+        // gb.sound.fx(dead); 
+        gb.sound.play("pacman_death.wav");      
       }
     }
   }
