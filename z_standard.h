@@ -1,0 +1,2 @@
+void showgameover();
+void showtitle();
