@@ -32,11 +32,11 @@ void showtitle() {
   gb.display.cursorY=6;
   gb.display.print(highscore);
   gb.display.setColor(YELLOW);
-  gb.display.drawBitmap(10,13,gamelogo);
+  gb.display.drawBitmap(10,18,gamelogo);
   gb.display.cursorX=0;
   gb.display.cursorY=56;
   gb.display.setColor(WHITE);
-  gb.display.print(" A: PLAY     C: QUIT");
+  gb.display.print("A: PLAY   MENU: QUIT");
   if (gb.buttons.pressed(BUTTON_A)) {
     gamestatus="newgame";
     gb.sound.playOK();

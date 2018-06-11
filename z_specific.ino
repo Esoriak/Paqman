@@ -41,7 +41,7 @@ void drawfruit() {
       //fruit eaten
       fruitvisible=0;
       score=score+100*gamelevel;
-      // playsoundfx(6,1); // play fruit eaten sound
+      gb.sound.fx(eat_bigdot); 
     }         
   }
 }
@@ -103,13 +103,14 @@ void paqmanfulltile() {
     if (checkval==1) {
       dotstoeat=--dotstoeat;
       if (dotstoeat % 2 == 0) {
-        // playsoundfx(3,1);
+        gb.sound.fx(eat_dot1);
       } else {
-        // playsoundfx(4,1);
+        gb.sound.fx(eat_dot2);
       }
       leveldots[checkbyte]=leveldots[checkbyte]-(1 << checkbit);
       if ((paqmanx==1 or paqmanx==26) and (paqmany==4 or paqmany==24)) {
         // power pill eaten
+        gb.sound.fx(eat_bigdot);
         score=score+50;
         powerpilltimer=180-gamelevel*15;
         ghostscore=200;
