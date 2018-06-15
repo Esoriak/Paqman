@@ -5,7 +5,6 @@
 
 #include <Gamebuino-Meta.h>
 #include "z_specific.h"
-#include "z_nonstandard.h"
 #include "z_highscore.h"
 
 // define variables and constants
@@ -59,6 +58,7 @@ int u2;
 String ghostmode;
 int ghostmodetime;
 int screenyoffset;
+int screenxoffset;
 byte animationframe;
 byte animationcounter;
 byte fruitshape;
@@ -69,8 +69,6 @@ int checkval;
 int paqpos;
 byte backgroundtimer;
 byte backgroundsound;
-
-int camera_x, camera_y;
 
 const SaveDefault savefileDefaults[] = {
   { 0, SAVETYPE_INT, 9999, 0 },
@@ -92,7 +90,7 @@ B01111111,B11111001,B11111111,B11100000,
 B01000010,B00001001,B00000100,B00100000,
 B01000010,B00001001,B00000100,B00100000,
 B01000010,B00001001,B00000100,B00100000,
-B01111111,B11111111,B11111111,B11111110,
+B01111111,B11111111,B11111111,B11100000,
 B01000010,B01000000,B00100100,B00100000,
 B01000010,B01000000,B00100100,B00100000,
 B01111110,B01111001,B11100111,B11100000,

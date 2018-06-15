@@ -1,15 +1,131 @@
+// GLOBAL VARS
+
+extern String gamestatus;
+extern byte lives;
+extern byte gamelevel;
+extern byte checkleft;
+extern byte checkright;
+extern byte checktop;
+extern byte checkbottom;
+extern int yeahtimer;
+extern int deadtimer;
+
+//----------------------------------------------------------------------------
+void newgame(){
+  score=0;
+  lives=3;
+  gamelevel=0;
+  gamestatus="newlevel"; 
+}
+//----------------------------------------------------------------------------
+void newlevel() {
+  for (int i = 0 ; i < 132 ; i++) { leveldots[i]=dotscreen[i]; }
+  dotstoeat=244;
+  fruitshape=gamelevel;
+  gb.sound.play("pacman_beginning.wav");
+  delay (400);
+  if (fruitshape>7) { fruitshape=7; }
+  gamestatus="newlife"; 
+}
+//----------------------------------------------------------------------------
+void newlife() {
+  powerpilltimer=0;
+  yeahtimer=0;
+  deadtimer=-1;
+  paqmanx=13;
+  paqmany=24;
+  paqmanxadd=2;
+  paqmanyadd=0;
+  paqmanxdir=1;
+  paqmanydir=0;
+  paqmanghostxdir=1;
+  paqmanghostydir=1;
+  paqmanshape=12;
+  paqmananimation=3;
+  fruitvisible=0;
+  waittime=30;
+  ghostx[0]=13;
+  ghosty[0]=12;
+  ghostxadd[0]=1;
+  ghostyadd[0]=0;
+  ghostxdir[0]=1;
+  ghostydir[0]=0;
+  ghostx[1]=12;
+  ghosty[1]=15;
+  ghostxadd[1]=0;
+  ghostyadd[1]=0;
+  ghostxdir[1]=1;
+  ghostydir[1]=0;
+  ghostx[2]=13;
+  ghosty[2]=15;
+  ghostxadd[2]=2;
+  ghostyadd[2]=0;
+  ghostxdir[2]=1;
+  ghostydir[2]=0;
+  ghostx[3]=15;
+  ghosty[3]=15;
+  ghostxadd[3]=0;
+  ghostyadd[3]=0;
+  ghostxdir[3]=-1;
+  ghostydir[3]=0;
+  ghostmode="chase";
+  ghostmodetime=1;
+  gamestatus="running";
+}
+//----------------------------------------------------------------------------
+void showscore(){
+  if (screenyoffset==-5 or screenyoffset==56) {
+    int i=0;
+    if (screenyoffset==56) { i=43; }
+    gb.display.setColor(YELLOW);
+    if (lives>1) { gb.display.drawBitmap(0,i,paqman[3]); }
+    if (lives>2) { gb.display.drawBitmap(6,i,paqman[3]); }
+    gb.display.setColor(WHITE);
+    gb.display.cursorX=40-2*(score>9)-2*(score>99)-2*(score>999);
+    gb.display.cursorY=i;
+    gb.display.print(score);
+    gb.display.cursorX=72;
+    gb.display.print(gamelevel+1);
+  }
+}
+//----------------------------------------------------------------------------
+void nextlevelcheck() {
+  if (yeahtimer>0) {
+    yeahtimer=--yeahtimer;
+    if (yeahtimer==0) {
+      gamelevel=gamelevel+1;
+      gamestatus="newlevel"; 
+    } 
+  }  
+}
+//----------------------------------------------------------------------------
+void handledeath() {
+  deadtimer=--deadtimer;
+  int i = 7 - deadtimer / 10;
+  gb.display.setColor(YELLOW);
+  gb.display.drawBitmap(paqmanx*3+paqmanxadd-1-screenxoffset,paqmany*3+paqmanyadd-screenyoffset-1,paqman[12+i]);
+  if (deadtimer==0) {
+    deadtimer=-1;
+    lives=--lives;  
+    if (lives == 0) {
+      gamestatus = "gameover";
+    } else {
+      gamestatus = "newlife";          
+    }          
+  }
+}
 //----------------------------------------------------------------------------
 void drawpaqman() {
   if (deadtimer==-1) {
     gb.display.setColor(YELLOW);
-    gb.display.drawBitmap(paqmanx*3+paqmanxadd-1,paqmany*3+paqmanyadd-screenyoffset-1,paqman[paqmanshape+paqmananimation]);
+    gb.display.drawBitmap(paqmanx*3+paqmanxadd-1-screenxoffset,paqmany*3+paqmanyadd-screenyoffset-1,paqman[paqmanshape+paqmananimation]);
   } else { handledeath(); }
 }
 //----------------------------------------------------------------------------
 void drawready() {
   if (waittime>0) {
     gb.display.setColor(WHITE);
-    if (animationframe==0) { gb.display.drawBitmap(32,2,readylogo); }      
+    if (animationframe==0) { gb.display.drawBitmap(32-screenxoffset,2,readylogo); }      
     waittime=--waittime;
   }
 }
@@ -23,11 +139,21 @@ void drawmaze() {
   screenyoffset=((paqmany-7)*3)+paqmanyadd;
   if (screenyoffset<-5) { screenyoffset=-5; } // <0
   if (screenyoffset>56) { screenyoffset=56; } // >51
+  if (paqmanx > 21) {
+    screenxoffset = 7;
+  } else if ( paqmanx > 14 ) {
+    screenxoffset = 5 - (20 - paqmanx);
+  } else if ( (paqmanx > 12) ) {
+    screenxoffset = 0;
+  } else if ( (paqmanx > 5)) {
+    screenxoffset = paqmanx - 13 ;
+  } else {screenxoffset = - 7 ; }
+  
   if (yeahtimer==0) {
     gb.display.setColor(BLUE);
-    gb.display.drawBitmap(0,-screenyoffset,mazeimage);
+    gb.display.drawBitmap(-screenxoffset ,-screenyoffset,mazeimage);
   } else {
-    if (animationframe==0) { gb.display.drawBitmap(0,-screenyoffset,mazeimage); }        
+    if (animationframe==0) { gb.display.drawBitmap(-screenxoffset,-screenyoffset,mazeimage); }        
   }
 }
 //----------------------------------------------------------------------------
@@ -35,7 +161,7 @@ void drawfruit() {
   if (fruitvisible==0 and (dotstoeat==174 or dotstoeat==74)) { fruitvisible=400; }
   if (fruitvisible>0) {
     gb.display.setColor(RED);
-    gb.display.drawBitmap(41,53-screenyoffset,fruit[fruitshape]);
+    gb.display.drawBitmap(41-screenxoffset,53-screenyoffset,fruit[fruitshape]);
     fruitvisible=--fruitvisible;
     if ((paqmanx==13 or paqmanx==14) and paqmany==18) {
       //fruit eaten
@@ -163,11 +289,11 @@ void drawdotspills() {
         int drawyp=drawy*3-screenyoffset;
         if ((drawx==1 or drawx==26) and (drawy==4 or drawy==24) and drawyp>=0 and drawyp<48){
           if (animationframe==1) {
-            gb.display.drawFastHLine(drawx*3,drawyp+1,3);
-            gb.display.drawFastVLine(drawx*3+1,drawyp,3);
+            gb.display.drawFastHLine(drawx*3-screenxoffset,drawyp+1,3);
+            gb.display.drawFastVLine(drawx*3+1-screenxoffset,drawyp,3);
           }
         } else {
-        gb.display.drawPixel(drawx*3+1,drawyp+1);            
+        gb.display.drawPixel(drawx*3+1-screenxoffset,drawyp+1);            
         }
       }
     drawp=++drawp;
@@ -251,7 +377,7 @@ void drawghosts() {
         if (i==3) { u=2;gb.display.setColor(ORANGE); }
         if (i==1) { u=2;gb.display.setColor(RED); }
       }  
-      gb.display.drawBitmap(ghostx[i]*3+ghostxadd[i]-1,ghosty[i]*3+ghostyadd[i]-screenyoffset-1,ghost[u+animationframe]);
+      gb.display.drawBitmap(ghostx[i]*3+ghostxadd[i]-1-screenxoffset,ghosty[i]*3+ghostyadd[i]-screenyoffset-1,ghost[u+animationframe]);
     }
   } 
 }
