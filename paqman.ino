@@ -5,12 +5,11 @@
 
 #include <Gamebuino-Meta.h>
 #include "z_specific.h"
-#include "z_standard.h"
+#include "z_nonstandard.h"
+#include "z_highscore.h"
 
 // define variables and constants
 String gamestatus;
-int score;
-int highscore;
 byte lives;
 byte gamelevel;
 byte checkleft;
@@ -70,6 +69,21 @@ int checkval;
 int paqpos;
 byte backgroundtimer;
 byte backgroundsound;
+
+int camera_x, camera_y;
+
+const SaveDefault savefileDefaults[] = {
+  { 0, SAVETYPE_INT, 9999, 0 },
+  { 1, SAVETYPE_BLOB, NAMELENGTH+1, 0 },
+  { 2, SAVETYPE_INT, 9999, 0 },
+  { 3, SAVETYPE_BLOB, NAMELENGTH+1, 0 },
+  { 4, SAVETYPE_INT, 9999, 0 },
+  { 5, SAVETYPE_BLOB, NAMELENGTH+1, 0 },
+  { 6, SAVETYPE_INT, 9999, 0 },
+  { 7, SAVETYPE_BLOB, NAMELENGTH+1, 0 },
+  { 8, SAVETYPE_INT, 9999, 0 },
+  { 9, SAVETYPE_BLOB, NAMELENGTH+1, 0 },
+};
 
 byte dotscreen[]={
 B00000000,B00000000,B00000000,B00000000,
@@ -154,8 +168,38 @@ void setup(){
   gb.begin();
   gb.setFrameRate(30);
   // gb.titleScreen(F("    Yoda's"),gamelogo);
+  initHighscore();
   gb.pickRandomSeed();
   gamestatus="title";
+}
+
+
+//----------------------------------------------------------------------------
+void showtitle() {
+  gb.display.clear();
+  gb.display.setColor(WHITE);
+  gb.display.cursorX=0;
+  gb.display.cursorY=0;   
+  gb.display.print("  LAST         HIGH");
+  gb.display.cursorX=14-2*(score>9)-2*(score>99)-2*(score>999);
+  gb.display.cursorY=6;
+  gb.display.print(score);
+  gb.display.cursorX=66-2*(highscore[0]>9)-2*(highscore[0]>99)-2*(highscore[0]>999);
+  gb.display.cursorY=6;
+  gb.display.print(highscore[0]);
+  gb.display.setColor(YELLOW);
+  gb.display.drawBitmap(10,18,gamelogo);
+  gb.display.cursorX=0;
+  gb.display.cursorY=56;
+  gb.display.setColor(WHITE);
+  gb.display.print("A: PLAY   MENU: QUIT");
+  if (gb.buttons.pressed(BUTTON_A)) {
+    gamestatus="newgame";
+    gb.sound.playOK();
+  }
+  if (gb.buttons.pressed(BUTTON_MENU)) {
+    // gb.titleScreen(F("Yoda's"),gamelogo);
+  }
 }
 
 // loop
@@ -174,7 +218,6 @@ void loop(){
     // game running
     if (gamestatus=="running"){
       gb.display.clear();
-      // gb.sound.play("pacman_beginning.wav");
       handleanimation(); //handle animation
       drawmaze(); //draw maze
       drawfruit(); //draw fruit      
@@ -199,7 +242,7 @@ void loop(){
     if (gamestatus=="title") { showtitle(); }
 
     // game over
-    if (gamestatus=="gameover") { showgameover(); }
+    if (gamestatus=="gameover") { saveHighscore(score); }
 
   } // end of loop
  } // end of update

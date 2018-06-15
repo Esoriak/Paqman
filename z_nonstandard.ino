@@ -2,8 +2,6 @@
 // GLOBAL VARS
 
 extern String gamestatus;
-extern int score;
-extern int highscore;
 extern byte lives;
 extern byte gamelevel;
 extern byte checkleft;
@@ -25,6 +23,8 @@ void newlevel() {
   for (int i = 0 ; i < 132 ; i++) { leveldots[i]=dotscreen[i]; }
   dotstoeat=244;
   fruitshape=gamelevel;
+  gb.sound.play("pacman_beginning.wav");
+  delay (400);
   if (fruitshape>7) { fruitshape=7; }
   gamestatus="newlife"; 
 }
@@ -102,9 +102,6 @@ void nextlevelcheck() {
 //----------------------------------------------------------------------------
 void handledeath() {
   deadtimer=--deadtimer;
-  if (deadtimer % 5 == 0) {
-    gb.sound.playTick(); // play dead sound
-  }
   int i = 7 - deadtimer / 10;
   gb.display.setColor(YELLOW);
   gb.display.drawBitmap(paqmanx*3+paqmanxadd-1,paqmany*3+paqmanyadd-screenyoffset-1,paqman[12+i]);

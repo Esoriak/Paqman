@@ -266,9 +266,9 @@ void checkghostcollission() {
         ghoststatus[i]=1;
          gb.sound.fx(eat_ghost);
       } else { // paq man eaten
-        deadtimer=70;
+        deadtimer=90;
         // gb.sound.fx(dead); 
-        gb.sound.play("pacman_death.wav");      
+        gb.sound.play("pacman_death.wav");     
       }
     }
   }
