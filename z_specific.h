@@ -1,5 +1,8 @@
-void drawpaqman();
+#ifndef _SPECIFIC_H_
+#define _SPECIFIC_H_
 
+
+void drawpaqman();
 void handlepowerpilltimer();
 void moveghosts();
 void newgame();
@@ -21,3 +24,5 @@ void ghostmodetimer();
 void settargettiles();
 void checkghostcollission();
 void drawdotspills();
+
+#endif _SPECIFIC_H_
